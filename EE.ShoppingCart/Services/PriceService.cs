@@ -1,4 +1,4 @@
-using System.Text.Json;
+using System.Net.Http.Json;
 using EE.ShoppingCart.Models;
 using Microsoft.Extensions.Logging;
 
@@ -15,25 +15,27 @@ namespace EE.ShoppingCart.Services
             _logger = logger;
         }
 
-        public async Task<decimal> GetPriceAsync(string product)
+        public async Task<PriceResult> GetPriceAsync(string product)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(product))
                 {
                     _logger.LogWarning("Product name cannot be empty.");
-                    return 0;
+                    return new PriceResult(false, 0, "Product name cannot be empty.");
                 }
 
                 var url = $"/backend-take-home-test-data/{product}.json";
-                var response = await _httpClient.GetStringAsync(url);
-                var price = JsonSerializer.Deserialize<ProductPrice>(response);
-                return price?.Price ?? 0;
+                var response = await _httpClient.GetFromJsonAsync<ProductPrice>(url);
+
+                return response != null && !string.IsNullOrWhiteSpace(response.Title)
+                    ? new PriceResult(true, response.Price, null)
+                    : new PriceResult(false, 0, "Product not found.");
             }
             catch (HttpRequestException ex)
             {
                 _logger.LogError("Failed to fetch price for product: {product}. Error: {ex.Message}", product, ex.Message);
-                return 0;
+                return new PriceResult(false, 0, "Failed to fetch price.");
             }
         }
     }

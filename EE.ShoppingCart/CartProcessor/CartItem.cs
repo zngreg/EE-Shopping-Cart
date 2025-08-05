@@ -3,7 +3,7 @@ namespace EE.ShoppingCart.Cart
     public class CartItem
     {
         public string ProductName { get; }
-        public int Quantity { get; set; }
+        public int Quantity { get; internal set; }
         public decimal UnitPrice { get; }
 
         public CartItem(string productName, int quantity, decimal unitPrice)

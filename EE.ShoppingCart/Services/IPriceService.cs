@@ -1,7 +1,9 @@
+using EE.ShoppingCart.Models;
+
 namespace EE.ShoppingCart.Services
 {
     public interface IPriceService
     {
-        Task<decimal> GetPriceAsync(string productName);
+        Task<PriceResult> GetPriceAsync(string productName);
     }
 }
